@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9BC6D61A-5D4B-4D57-BC6B-5E3F9D04377E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MAKLONM</RootNamespace>
+    <AssemblyName>MAKLONM</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <WarningLevel>3</WarningLevel>
+    <FileVersion>23.117.0021</FileVersion>
+    <InformationalVersion>23.117.0021</InformationalVersion>
+    <Copyright>Copyright © 2005-2024 Acumatica, Inc. All rights reserved.</Copyright>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PX.Common">
+      <HintPath>..\..\..\..\Bin\PX.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Common.Std">
+      <HintPath>..\..\..\..\Bin\PX.Common.Std.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.CS.Contracts">
+      <HintPath>..\..\..\..\Bin\PX.CS.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Data">
+      <HintPath>..\..\..\..\Bin\PX.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Data.BQL.Fluent, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Bin\PX.Data.BQL.Fluent.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Objects">
+      <HintPath>..\..\..\..\Bin\PX.Objects.DLL</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BLCExt\MAKLEmployeeActivitiesApproveExtension.cs" />
+    <Compile Include="BLCExt\MAKLPMBillingEngineExtension.cs" />
+    <Compile Include="BLCExt\MAKLProjectEntry_Extension.cs" />
+    <Compile Include="BLC\MAKLLeadEmailProcessor.cs" />
+    <Compile Include="DACExt\INKitSpecHdrExtensions.cs" />
+    <Compile Include="DACExt\INKitSpecNonStkDetExtensions.cs" />
+    <Compile Include="DACExt\MAKLEPActivityApproveExt.cs" />
+    <Compile Include="DACExt\PMSetupExtensions.cs" />
+    <Compile Include="DACExt\PMTaskExtensions.cs" />
+    <Compile Include="DACExt\InventoryItemExtensions.cs" />
+    <Compile Include="BLCExt\MAKLARInvoiceEntryExtension.cs" />
+    <Compile Include="DACExt\MAKLARTranExtensions.cs" />
+    <Compile Include="BLC\MAKLCalendarBillingProcess.cs" />
+    <Compile Include="BLCExt\MAKLINKitSpecMaint.cs" />
+    <Compile Include="BLCExt\MAKLProjectTaskEntry.cs" />
+    <Compile Include="BLCExt\MAKLNonStockItemMaint.cs" />
+    <Compile Include="BLCExt\MAKLCRActivityMaint.cs" />
+    <Compile Include="BLCExt\MAKLEmployeeActivitiesRelease.cs" />
+    <Compile Include="BLCExt\MAKLPMQuoteMaint.cs" />
+    <Compile Include="DACExt\MAKLPMQuoteTaskExtensions.cs" />
+    <Compile Include="DAC\MAKLLeadClassActivityType.cs" />
+    <Compile Include="DAC\MAKLLeadDocument.cs" />
+    <Compile Include="BLCExt\MAKLLeadMaint.cs" />
+    <Compile Include="BLCExt\MAKLCRLeadClassMaint.cs" />
+    <Compile Include="DACExt\MAKLEMailAccountExtensions.cs" />
+    <Compile Include="BLCExt\MAKLEMailAccountMaint.cs" />
+    <Compile Include="DACExt\MAKLContactExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
+      <Version>5.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
