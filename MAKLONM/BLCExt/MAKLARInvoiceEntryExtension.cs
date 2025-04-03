@@ -8,7 +8,7 @@ using static PX.Objects.FA.FABookSettings.midMonthType;
 
 namespace PX.Objects.AR
 {
-    public class MAKLARInvoiceEntry_Extension : PXGraphExtension<PX.Objects.AR.ARInvoiceEntry>
+    public class MAKLARInvoiceEntry_Extension : PXGraphExtension<PX.Objects.PM.ARInvoiceEntryExt, PX.Objects.AR.ARInvoiceEntry>
     {
 
 
@@ -27,8 +27,11 @@ namespace PX.Objects.AR
                 foreach (ARTran line in Base.Transactions.Select())
                 {
                     InsertComponents(line);
+                    line.ManualPrice = false;
                 }
+                Base.recalculateDiscountsAction.Press();
             }
+            
             baseMethod();
         }
 
@@ -154,6 +157,7 @@ namespace PX.Objects.AR
                             MAKLARTranExt tranExt = PXCache<ARTran>.GetExtension<MAKLARTranExt>(tran);
                             tran.InventoryID = component.CompInventoryID;
                             tran.Qty = component.DfltCompQty;
+                            tran.ManualPrice = true;
                             tran.CuryUnitPrice = componentExt.UsrRate;
                             tran.CuryTranAmt = componentExt.UsrAmount;
                             tran.Date = row.Date;
@@ -178,6 +182,28 @@ namespace PX.Objects.AR
                 }
             }
         }
+
+        public delegate void SubtractValuesToInvoiceDelegate(ARTran line, int? revenueAccountGroup, int mult);
+        [PXOverride]
+        public void SubtractValuesToInvoice(ARTran line, int? revenueAccountGroup, int mult, SubtractValuesToInvoiceDelegate baseMethod)
+        {            
+            InventoryItem item = PXSelect<InventoryItem, Where<InventoryItem.inventoryID, Equal<Required<InventoryItem.inventoryID>>>>.Select(Base, line.InventoryID);
+            MAKLARTranExt tranExt = PXCache<ARTran>.GetExtension<MAKLARTranExt>(line);
+            if (item != null)
+            {
+                if (item.KitItem == false && tranExt.UsrOrigLineNbr == null)
+                {                    
+                        //processing the standard logic only for the lines which are not added via the custom component billing
+                        baseMethod(line, revenueAccountGroup, mult);                    
+                }
+            }
+            else
+            {
+                baseMethod(line, revenueAccountGroup, mult);
+            }
+
+        }
+
 
         // Ability to select Kits in AR Invoice
         [PXRemoveBaseAttribute(typeof(ARTranInventoryItemAttribute))]

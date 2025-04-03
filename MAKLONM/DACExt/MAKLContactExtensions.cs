@@ -16,7 +16,7 @@ namespace PX.Objects.CR
 
     #region UsrDsqReason
     [PXDBString(10)]
-    [PXUIField(DisplayName="Disqualify Reason")]
+    [PXUIField(DisplayName="Qual./Disq. Reason")]
     [PXStringList()]
     [PXDefault(PersistingCheck = PXPersistingCheck.Nothing)]
     public virtual string UsrDsqReason { get; set; }

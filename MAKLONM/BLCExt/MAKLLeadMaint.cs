@@ -22,10 +22,14 @@ namespace PX.Objects.CR
 
         public PXSelect<MAKLLeadClassActivityType, Where<MAKLLeadClassActivityType.classID, Equal<Current<CRLead.classID>>>> LeadClassActivityTypes;
 
+        public PXSelect<MAKLLeadHistory, Where<MAKLLeadHistory.contactID, Equal<Current<CRLead.contactID>>>> LeadHistory;
+
         public PXAction<CRLead> generateActivities;
         [PXMassAction]
         [PXUIField(DisplayName = "Generate Activities", MapEnableRights = PXCacheRights.Select, MapViewRights = PXCacheRights.Select)]
         [PXButton(Category = PX.Objects.CS.ActionCategories.Other)]
+
+        
 
         public IEnumerable GenerateActivities(PXAdapter adapter)
         {
@@ -173,22 +177,53 @@ namespace PX.Objects.CR
             }
         }
 
-        public delegate void PersistDelegate();
-        [PXOverride]
-        public void Persist(PersistDelegate baseMethod)
-        {
-            if (Base.Lead.Current != null)
-            {
-                if (Base.Lead.Current.tstamp == null)
-                {
-                  //  GenerateActivities(Base);
-                }
-            }
-            baseMethod();
-        }
-        
+        //public delegate void PersistDelegate();
+        //[PXOverride]
+        //public void Persist(PersistDelegate baseMethod)
+        //{
+        //    if (Base.Lead.Current != null)
+        //    {
+        //        if (Base.Lead.Current.tstamp == null)
+        //        {
+        //          //  GenerateActivities(Base);
+        //        }
+        //    }
+        //    baseMethod();
+        //}
 
-        protected void CRLead_UsrDsqStage_FieldSelecting(PXCache cache, PXFieldSelectingEventArgs e)
+        //protected void CRLead_RowPersisting(PXCache cache, PXRowPersistingEventArgs e)
+        //{
+
+        //    var row = (CRLead)e.Row;
+        //    if (row != null)
+        //    {
+        //        var status = cache.GetStatus(row);
+        //        if (status == PXEntryStatus.Inserted || status == PXEntryStatus.Updated)
+        //        {
+        //            PreviousStatus = task?.GetExtension<MYPEPMTask>().UsrMYPExWorkflowStageID;
+        //        }
+        //    }
+
+
+        //}
+
+        protected void CRLead_Status_FieldUpdated(PXCache cache, PXFieldUpdatedEventArgs e)
+        {
+           var row = (CRLead)e.Row;
+            {
+                var newLeadHistory = new MAKLLeadHistory()
+                {
+                    ContactID = row.ContactID,
+                    PreviousStatus = e.OldValue.ToString(),
+                    Status = row.Status,                    
+                    Date = PXTimeZoneInfo.Now
+                };
+                newLeadHistory = LeadHistory.Insert(newLeadHistory);
+            }
+        }
+
+
+            protected void CRLead_UsrDsqStage_FieldSelecting(PXCache cache, PXFieldSelectingEventArgs e)
         {
 
             var row = (CRLead)e.Row;
@@ -232,10 +267,13 @@ namespace PX.Objects.CR
             {
                 MAKLContactExt leadExt = PXCache<Contact>.GetExtension<MAKLContactExt>(row);
 
+                List<string> reasonvalues = new List<string>();
+                List<string> reasonlabels = new List<string>();
+
                 if (leadExt.UsrDsqStage != null)
                 {
-                    List<string> reasonvalues = new List<string>();
-                    List<string> reasonlabels = new List<string>();
+                    //List<string> reasonvalues = new List<string>();
+                    //List<string> reasonlabels = new List<string>();
 
                     CSAttributeDetail attributeStageValue = PXSelect<CSAttributeDetail,
                          Where<CSAttributeDetail.attributeID, Equal<Required<CSAttributeDetail.attributeID>>,
@@ -256,6 +294,39 @@ namespace PX.Objects.CR
                         }
                     }
                     PXStringListAttribute.SetList<MAKLContactExt.usrDsqReason>(cache, row, reasonvalues.ToArray(), reasonlabels.ToArray());
+                }
+                else
+                {
+                    string attributeID = null;
+                    switch (row.Resolution)
+                    {
+                        case "QM":
+                            attributeID = "QUALIFYLD";
+                            break;
+                        case "AS":
+                            attributeID = "ACCEPTLEAD";
+                            break;
+                        case "PI":
+                            attributeID = "OPENLEAD";
+                            break;                        
+                    }
+
+                    if (!String.IsNullOrEmpty(attributeID))
+                    {
+                        var attributeReasons = PXSelect<CSAttributeDetail,
+                                 Where<CSAttributeDetail.attributeID, Equal<Required<CSAttributeDetail.attributeID>>>>.Select(Base, attributeID);
+
+                        if (attributeReasons?.Count > 0)
+                        {
+                            foreach (CSAttributeDetail stage in attributeReasons)
+                            {
+                                reasonvalues.Add(stage.ValueID);
+                                reasonlabels.Add(stage.Description);
+                            }
+                        }
+
+                        PXStringListAttribute.SetList<MAKLContactExt.usrDsqReason>(cache, row, reasonvalues.ToArray(), reasonlabels.ToArray());
+                    }
                 }
             }
         }

@@ -86,6 +86,7 @@
     <Compile Include="DACExt\MAKLEMailAccountExtensions.cs" />
     <Compile Include="BLCExt\MAKLEMailAccountMaint.cs" />
     <Compile Include="DACExt\MAKLContactExtensions.cs" />
+    <Compile Include="DAC\MAKLLeadHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

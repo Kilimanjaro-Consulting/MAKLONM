@@ -235,6 +235,18 @@ namespace MAKLONM
                             lead.CampaignID = campaign.CampaignID;
                         }                       
                     }
+
+                    //SNAPFID
+                    if (!String.IsNullOrEmpty(parsedEmail.MYOBREF))
+                    {
+                        CSAnswers myobrefAtr = PXSelect<
+                            CSAnswers,
+                            Where<CSAnswers.attributeID, Equal<Required<CSAnswers.attributeID>>,
+                                And<CSAnswers.refNoteID, Equal<Required<CSAnswers.refNoteID>>>>>
+                            .Select(graph, "SNAPFID", lead.NoteID);
+                        myobrefAtr.Value = parsedEmail.MYOBREF;
+                        graph.Answers.Cache.Update(myobrefAtr);
+                    }
                 }
 
                 message.RefNoteID = PXNoteAttribute.GetNoteID<CRLead.noteID>(leadCache, lead);
@@ -279,6 +291,7 @@ namespace MAKLONM
             string interpreterRequiredLabel = "Interpreter Required?:";
             string aboriginalOrTorresStraitLabel = "Aboriginal or Torres Strait:";
             string campaignLabel = "Campaign:";
+            string myobrefLabel = "MYOBREF:";
 
             int enquirerFirstNameStart = result.IndexOf(enquirerFirstNameLabel);
             int enquirerFirstNameEnd = enquirerFirstNameStart + enquirerFirstNameLabel.Length;
@@ -338,6 +351,9 @@ namespace MAKLONM
             int campaignStart = result.IndexOf(campaignLabel);
             int campaignEnd = campaignStart + campaignLabel.Length;
 
+            int myobrefStart = result.IndexOf(myobrefLabel);
+            int myobrefEnd = myobrefStart + myobrefLabel.Length;
+
 
             parsed.EnquirerFirstName = result.Substring(enquirerFirstNameEnd, (enquirerLastNameStart - enquirerFirstNameEnd)).Trim();
             parsed.EnquirerLastName = result.Substring(enquirerLastNameEnd, (enquirerRelationshipToParticipantStart - enquirerLastNameEnd)).Trim();
@@ -348,8 +364,13 @@ namespace MAKLONM
             parsed.ParticipantLastName = result.Substring(participantLastNameEnd, (ageStart - participantLastNameEnd)).Trim();
             parsed.Age = result.Substring(ageEnd, (dateofBirthStart - ageEnd)).Trim();
 
-            var datevalue = DateTime.Parse(result.Substring(dateofBirthEnd, (fundingTypeStart - dateofBirthEnd)).Trim());
-            parsed.DateofBirth = datevalue.ToString("yyyy-MM-dd");
+
+            DateTime datevalue;            
+            DateTime.TryParse(result.Substring(dateofBirthEnd, (fundingTypeStart - dateofBirthEnd)).Trim(), out datevalue);
+            if (datevalue != DateTime.MinValue)
+            {
+                parsed.DateofBirth = datevalue.ToString("yyyy-MM-dd");
+            }
 
             parsed.FundingType = result.Substring(fundingTypeEnd, (interestedServicesStart - fundingTypeEnd)).Trim();
             parsed.InterestedServices = result.Substring(interestedServicesEnd, (interestInGroupServiceAttendanceDaysStart - interestedServicesEnd)).Trim();
@@ -359,15 +380,9 @@ namespace MAKLONM
             parsed.PrimaryDisability = result.Substring(primaryDisabilityEnd, (otherDisabilityStart - primaryDisabilityEnd)).Trim();
             parsed.OtherDisability = result.Substring(otherDisabilityEnd, (interpreterRequiredStart - otherDisabilityEnd)).Trim();
             parsed.InterpreterRequired = result.Substring(interpreterRequiredEnd, (aboriginalOrTorresStraitStart - interpreterRequiredEnd)).Trim();
-            if (campaignStart > 0)
-            {
-                parsed.AboriginalOrTorresStrait = result.Substring(aboriginalOrTorresStraitEnd, (campaignStart - aboriginalOrTorresStraitEnd)).Trim();
-                parsed.Campaign = result.Substring(campaignEnd, (totallength - campaignEnd)).Trim();
-            }
-            else
-            {
-                parsed.AboriginalOrTorresStrait = result.Substring(aboriginalOrTorresStraitEnd, (totallength - aboriginalOrTorresStraitEnd)).Trim();
-            }           
+            parsed.AboriginalOrTorresStrait = result.Substring(aboriginalOrTorresStraitEnd, (campaignStart - aboriginalOrTorresStraitEnd)).Trim();
+            parsed.Campaign = result.Substring(campaignEnd, (myobrefStart - campaignEnd)).Trim();
+            parsed.MYOBREF = result.Substring(myobrefEnd, (totallength - myobrefEnd)).Trim();                     
 
             return parsed;
         }
@@ -393,6 +408,7 @@ namespace MAKLONM
             public string InterpreterRequired { get; set; }
             public string AboriginalOrTorresStrait { get; set; }
             public string Campaign { get; set; }
+            public string MYOBREF { get; set; }
         }
     }
 }
